@@ -5,8 +5,8 @@ import { createWriteStream } from 'node:fs'
 import { pipeline } from 'node:stream'
 import { promisify } from 'node:util'
 
-const pump = promisify(pipeline) // pipeline permite aguardar o processo de upload finalizar
-// promisses é a forma mais correcta do javascript para saber se as coisas acabaram
+const pump = promisify(pipeline)
+
 export async function uploadRoutes(app: FastifyInstance) {
   app.post('/upload', async (request, reply) => {
     const upload = await request.file({
@@ -32,7 +32,7 @@ export async function uploadRoutes(app: FastifyInstance) {
     const fileName = fileId.concat(extension)
 
     const writeStream = createWriteStream(
-      resolve(__dirname, '../../uploads/', fileName), // vai padronizar o caminho pela barra \/
+      resolve(__dirname, '..', '..', 'uploads', fileName),
     )
 
     await pump(upload.file, writeStream)
@@ -40,6 +40,6 @@ export async function uploadRoutes(app: FastifyInstance) {
     const fullUrl = request.protocol.concat('://').concat(request.hostname)
     const fileUrl = new URL(`/uploads/${fileName}`, fullUrl).toString()
 
-    return fileUrl
+    return { fileUrl }
   })
 }
